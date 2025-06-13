@@ -2,10 +2,12 @@ FROM node:24-alpine3.21
 
 WORKDIR /usr/src/app
 
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 COPY . .
 
-RUN yarn install --frozen-lockfile --production=false
+RUN pnpm install
 
 EXPOSE 3000
 
-CMD ["yarn", "start:dev"]
+CMD ["pnpm", "start:dev"]
