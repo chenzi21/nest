@@ -17,7 +17,7 @@ RUN pnpm install
 COPY . .
 
 # Generate Prisma client and ensure it's in the right location
-RUN pnpm prisma generate
+RUN pnpm run prisma:generate
 
 # Build the application
 RUN pnpm build
@@ -43,8 +43,6 @@ RUN pnpm install --prod && \
 # Copy built application and Prisma files from builder
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/prisma ./prisma
-COPY --from=builder /usr/src/app/@generated/prisma ./@generated/prisma
-
 COPY --from=builder /usr/src/app/docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh
 
