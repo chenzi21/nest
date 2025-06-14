@@ -7,6 +7,13 @@
       {
         "name": "@nestjs/swagger"
       }
-    ]
+    ],
+    "webpack": true,
+    "tsConfigPath": "tsconfig.json",
+    "builder": "swc",
+    "typeCheck": true,
+    "deleteOutDir": true,
+    "assets": [{ "include": "../prisma", "outDir": "dist/prisma" }],
+    "watchAssets": true
   }
 }
