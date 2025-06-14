@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { PrismaModule } from 'nestjs-prisma';
 import { BooksManager } from './books.manager';
+import { PrismaModule } from '@prisma/prisma.module';
 
 @Module({
   imports: [PrismaModule],
