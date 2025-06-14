@@ -20,15 +20,17 @@ describe('PrismaService', () => {
 
   describe('onModuleInit', () => {
     it('should connect to the database', async () => {
+      const connectSpy = jest.spyOn(service, '$connect');
       await service.onModuleInit();
-      expect(service.$connect).toHaveBeenCalledTimes(1);
+      expect(connectSpy).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('onModuleDestroy', () => {
     it('should disconnect from the database', async () => {
+      const disconnectSpy = jest.spyOn(service, '$disconnect');
       await service.onModuleDestroy();
-      expect(service.$disconnect).toHaveBeenCalledTimes(1);
+      expect(disconnectSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
