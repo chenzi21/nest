@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma/prisma.service';
 import { CreateBookDto, UpdateBookDto } from './books.dto';
+import { HandleTransformPrismaError } from '@prisma/prisma-error.decorator';
 
 @Injectable()
 export class BooksManager {
@@ -14,6 +15,7 @@ export class BooksManager {
     });
   }
 
+  @HandleTransformPrismaError()
   async findOne(id: string) {
     return this.prisma.book.findUniqueOrThrow({
       where: { id },
@@ -26,6 +28,7 @@ export class BooksManager {
     });
   }
 
+  @HandleTransformPrismaError()
   async update(id: string, updateBookDto: UpdateBookDto) {
     return this.prisma.book.update({
       where: { id },
@@ -33,6 +36,7 @@ export class BooksManager {
     });
   }
 
+  @HandleTransformPrismaError()
   async remove(id: string) {
     return this.prisma.book.delete({
       where: { id },

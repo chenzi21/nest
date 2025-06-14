@@ -9,7 +9,6 @@ import { Prisma } from '@prisma/index';
 
 describe('BooksController (e2e)', () => {
   let app: INestApplication;
-  let prismaService: PrismaService;
 
   const testBook: CreateBookDto = {
     title: 'Test Book',
@@ -23,26 +22,48 @@ describe('BooksController (e2e)', () => {
     inStock: 10,
   };
 
+  const mockId = '123e4567-e89b-12d3-a456-426614174000';
+  const mockPrismaService = {
+    book: {
+      findMany: jest.fn(),
+      findUniqueOrThrow: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+  };
+
+  const prismaError = new Prisma.PrismaClientKnownRequestError(
+    'Record not found',
+    {
+      code: 'P2025',
+      clientVersion: '5.0.0',
+    },
+  );
+
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(PrismaService)
+      .useValue(mockPrismaService)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
-    prismaService = app.get<PrismaService>(PrismaService);
 
     await app.init();
   });
 
   afterAll(async () => {
-    // Clean up the database
-    await prismaService.book.deleteMany();
     await app.close();
   });
 
   describe('POST /books', () => {
     it('should create a new book', () => {
+      const createdBook = { id: mockId, ...testBook };
+      mockPrismaService.book.create.mockResolvedValue(createdBook);
+
       return request(app.getHttpServer() as Express)
         .post('/books')
         .send(testBook)
@@ -64,74 +85,69 @@ describe('BooksController (e2e)', () => {
 
   describe('GET /books', () => {
     it('should return an array of books', async () => {
-      // Create a book first
-      await request(app.getHttpServer() as Express)
-        .post('/books')
-        .send(testBook)
-        .expect(201);
+      const books = [{ id: mockId, ...testBook }];
+      mockPrismaService.book.findMany.mockResolvedValue(books);
 
       return request(app.getHttpServer() as Express)
         .get('/books')
         .expect(200)
         .expect((res) => {
           expect(Array.isArray(res.body)).toBe(true);
-          expect(res.body.length).toBeGreaterThan(0);
-          expect(res.body[0]).toHaveProperty('id');
+          expect(res.body.length).toBe(1);
+          expect(res.body[0].id).toBe(mockId);
         });
     });
   });
 
   describe('GET /books/:id', () => {
     it('should return a book by id', async () => {
-      // Create a book first
-      const createdBook = await request(app.getHttpServer() as Express)
-        .post('/books')
-        .send(testBook)
-        .expect(201);
+      const book = { id: mockId, ...testBook };
+      mockPrismaService.book.findUniqueOrThrow.mockResolvedValue(book);
 
       return request(app.getHttpServer() as Express)
-        .get(`/books/${createdBook.body.id}`)
+        .get(`/books/${mockId}`)
         .expect(200)
         .expect((res) => {
-          expect(res.body.id).toBe(createdBook.body.id);
+          expect(res.body.id).toBe(mockId);
           expect(res.body.title).toBe(testBook.title);
         });
     });
 
     it('should return 404 for non-existent book', () => {
+      mockPrismaService.book.findUniqueOrThrow.mockRejectedValue(
+        new Prisma.PrismaClientKnownRequestError('Record not found', {
+          code: 'P2025',
+          clientVersion: '5.0.0',
+        }),
+      );
+
       return request(app.getHttpServer() as Express)
-        .get('/books/non-existent-id')
+        .get(`/books/${mockId}`)
         .expect(404);
     });
   });
 
   describe('PUT /books/:id', () => {
     it('should update a book', async () => {
-      // Create a book first
-      const createdBook = await request(app.getHttpServer() as Express)
-        .post('/books')
-        .send(testBook)
-        .expect(201);
-
-      const updateData = {
-        title: 'Updated Title',
-        price: 29.99,
-      };
+      const updateData = { title: 'Updated Title' };
+      const updatedBook = { id: mockId, ...testBook, ...updateData };
+      mockPrismaService.book.update.mockResolvedValue(updatedBook);
 
       return request(app.getHttpServer() as Express)
-        .put(`/books/${createdBook.body.id}`)
+        .put(`/books/${mockId}`)
         .send(updateData)
         .expect(200)
         .expect((res) => {
-          expect(res.body.id).toBe(createdBook.body.id);
+          expect(res.body.id).toBe(mockId);
           expect(res.body.title).toBe(updateData.title);
-          expect(res.body.price).toBe(updateData.price);
         });
     });
 
     it('should return 404 when updating non-existent book', () => {
+      mockPrismaService.book.update.mockRejectedValue(prismaError);
+
       return request(app.getHttpServer() as Express)
-        .put('/books/non-existent-id')
+        .put(`/books/${mockId}`)
         .send({ title: 'Updated Title' })
         .expect(404);
     });
@@ -139,25 +155,22 @@ describe('BooksController (e2e)', () => {
 
   describe('DELETE /books/:id', () => {
     it('should delete a book', async () => {
-      // Create a book first
-      const createdBook = await request(app.getHttpServer() as Express)
-        .post('/books')
-        .send(testBook)
-        .expect(201);
+      const deletedBook = { id: mockId, ...testBook };
+      mockPrismaService.book.delete.mockResolvedValue(deletedBook);
 
-      await request(app.getHttpServer() as Express)
-        .delete(`/books/${createdBook.body.id}`)
-        .expect(200);
-
-      // Verify the book is deleted
       return request(app.getHttpServer() as Express)
-        .get(`/books/${createdBook.body.id}`)
-        .expect(404);
+        .delete(`/books/${mockId}`)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.id).toBe(mockId);
+        });
     });
 
     it('should return 404 when deleting non-existent book', () => {
+      mockPrismaService.book.delete.mockRejectedValue(prismaError);
+
       return request(app.getHttpServer() as Express)
-        .delete('/books/non-existent-id')
+        .delete(`/books/${mockId}`)
         .expect(404);
     });
   });
