@@ -24,9 +24,8 @@ export class CreateBookDto implements Prisma.BookCreateInput {
   description: string;
 
   @IsNotEmpty()
-  @Type(() => Prisma.Decimal)
   @IsDecimal()
-  price: number;
+  price: Prisma.Decimal;
 
   @IsNotEmpty()
   @IsNumber()
@@ -66,9 +65,8 @@ export class UpdateBookDto implements Prisma.BookUpdateInput {
   description?: string;
 
   @IsOptional()
-  @Type(() => Prisma.Decimal)
   @IsDecimal()
-  price?: number;
+  price?: Prisma.Decimal;
 
   @IsOptional()
   @IsNumber()
