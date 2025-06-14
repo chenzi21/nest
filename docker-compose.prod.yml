@@ -4,8 +4,49 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
+      target: production
     ports:
       - 3001:3001
     environment:
       - PORT=3001
       - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - db
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    container_name: postgres
+    image: postgres
+    # nothing here is production ready, just for development
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: prisma
+      PGDATA: /data/postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - db
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -d postgres -U postgres']
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 3s
+
+networks:
+  db:
+    driver: bridge
+
+volumes:
+  db:
+    name: nest-db-prod

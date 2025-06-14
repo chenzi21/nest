@@ -1,13 +1,32 @@
-FROM node:24-alpine3.21
+# Stage 1: Build and run the application
+FROM node:24-alpine3.21 AS builder
 
+# Set the working directory
 WORKDIR /usr/src/app
 
+# Enable corepack and prepare pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
+# Copy package files first to leverage Docker cache
+COPY prisma package.json pnpm-lock.yaml* ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Add build argument for database URL
+ARG DATABASE_URL
+
+# Set it as an environment variable during build
+ENV DATABASE_URL=${DATABASE_URL}
+
+# Generate Prisma schema
+RUN pnpm prisma:generate
+
+# Copy the rest of the application
 COPY . .
 
-RUN pnpm install
-
+# Expose the port
 EXPOSE 3000
 
-CMD ["pnpm", "start:dev"]
+# Run the application
+CMD ["sh", "-c", "pnpm prisma migrate deploy && pnpm start:dev"]
