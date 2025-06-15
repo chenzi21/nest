@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { BooksManager } from './books.manager';
 import { CreateBookDto, UpdateBookDto } from './books.dto';
+import { HandleTransformPrismaError } from '@prisma/prisma-error.decorator';
 
 @Controller('books')
 export class BooksController {
@@ -21,6 +22,7 @@ export class BooksController {
   }
 
   @Get(':id')
+  @HandleTransformPrismaError()
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.booksManager.findOne(id);
   }
@@ -31,6 +33,7 @@ export class BooksController {
   }
 
   @Put(':id')
+  @HandleTransformPrismaError()
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateBookDto: UpdateBookDto,
@@ -39,6 +42,7 @@ export class BooksController {
   }
 
   @Delete(':id')
+  @HandleTransformPrismaError()
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.booksManager.remove(id);
   }
