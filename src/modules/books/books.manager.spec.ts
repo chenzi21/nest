@@ -76,16 +76,18 @@ describe('BooksManager', () => {
       });
     });
 
-    it('should throw NotFoundException when book is not found', async () => {
-      mockPrismaService.book.findUniqueOrThrow.mockRejectedValue(
-        new Prisma.PrismaClientKnownRequestError('Record not found', {
+    it('should throw PrismaClientKnownRequestError when book is not found', async () => {
+      const prismaError = new Prisma.PrismaClientKnownRequestError(
+        'Record not found',
+        {
           code: 'P2025',
           clientVersion: '5.0.0',
-        }),
+        },
       );
+      mockPrismaService.book.findUniqueOrThrow.mockRejectedValue(prismaError);
 
       await expect(manager.findOne('non-existent-id')).rejects.toThrow(
-        'Record not found',
+        Prisma.PrismaClientKnownRequestError,
       );
     });
 
@@ -146,18 +148,20 @@ describe('BooksManager', () => {
       });
     });
 
-    it('should throw NotFoundException when updating non-existent book', async () => {
+    it('should throw PrismaClientKnownRequestError when updating non-existent book', async () => {
       const updateBookDto: UpdateBookDto = { title: 'Updated Book' };
-      mockPrismaService.book.update.mockRejectedValue(
-        new Prisma.PrismaClientKnownRequestError('Record not found', {
+      const prismaError = new Prisma.PrismaClientKnownRequestError(
+        'Record not found',
+        {
           code: 'P2025',
           clientVersion: '5.0.0',
-        }),
+        },
       );
+      mockPrismaService.book.update.mockRejectedValue(prismaError);
 
       await expect(
         manager.update('non-existent-id', updateBookDto),
-      ).rejects.toThrow('Record not found');
+      ).rejects.toThrow(Prisma.PrismaClientKnownRequestError);
     });
 
     it('should rethrow non-Prisma errors', async () => {
@@ -182,16 +186,18 @@ describe('BooksManager', () => {
       });
     });
 
-    it('should throw NotFoundException when removing non-existent book', async () => {
-      mockPrismaService.book.delete.mockRejectedValue(
-        new Prisma.PrismaClientKnownRequestError('Record not found', {
+    it('should throw PrismaClientKnownRequestError when removing non-existent book', async () => {
+      const prismaError = new Prisma.PrismaClientKnownRequestError(
+        'Record not found',
+        {
           code: 'P2025',
           clientVersion: '5.0.0',
-        }),
+        },
       );
+      mockPrismaService.book.delete.mockRejectedValue(prismaError);
 
       await expect(manager.remove('non-existent-id')).rejects.toThrow(
-        'Record not found',
+        Prisma.PrismaClientKnownRequestError,
       );
     });
 
