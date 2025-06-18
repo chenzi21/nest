@@ -11,28 +11,38 @@ import {
 import { BooksManager } from './books.manager';
 import { CreateBookDto, UpdateBookDto } from './books.dto';
 import { HandleTransformPrismaError } from '@prisma/prisma-error.decorator';
+import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
 
+@ApiTags('books')
 @Controller('books')
 export class BooksController {
   constructor(private readonly booksManager: BooksManager) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get all books' })
   findAll() {
     return this.booksManager.findAll();
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a book by ID' })
+  @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
   @HandleTransformPrismaError()
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.booksManager.findOne(id);
   }
 
   @Post()
+  @ApiOperation({ summary: 'Create a new book' })
+  @ApiBody({ type: CreateBookDto })
   create(@Body() createBookDto: CreateBookDto) {
     return this.booksManager.create(createBookDto);
   }
 
   @Put(':id')
+  @ApiOperation({ summary: 'Update a book' })
+  @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
+  @ApiBody({ type: UpdateBookDto })
   @HandleTransformPrismaError()
   update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -42,6 +52,8 @@ export class BooksController {
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a book' })
+  @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
   @HandleTransformPrismaError()
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.booksManager.remove(id);

@@ -5,10 +5,10 @@ import {
   IsDate,
   IsDecimal,
   Min,
-  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Prisma } from '@prisma/index';
+import { PartialType, ApiProperty } from '@nestjs/swagger';
 
 export class CreateBookDto implements Prisma.BookCreateInput {
   @IsNotEmpty()
@@ -25,6 +25,7 @@ export class CreateBookDto implements Prisma.BookCreateInput {
 
   @IsNotEmpty()
   @IsDecimal()
+  @ApiProperty({ type: 'integer' })
   price: Prisma.Decimal;
 
   @IsNotEmpty()
@@ -51,43 +52,6 @@ export class CreateBookDto implements Prisma.BookCreateInput {
   inStock: number;
 }
 
-export class UpdateBookDto implements Prisma.BookUpdateInput {
-  @IsOptional()
-  @IsString()
-  title?: string;
-
-  @IsOptional()
-  @IsString()
-  author?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsDecimal()
-  price?: Prisma.Decimal;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(1)
-  pages?: number;
-
-  @IsOptional()
-  @IsString()
-  publisher?: string;
-
-  @IsOptional()
-  @Type(() => Date)
-  @IsDate()
-  published?: Date;
-
-  @IsOptional()
-  @IsString()
-  genre?: string;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  inStock?: number;
-}
+export class UpdateBookDto
+  extends PartialType(CreateBookDto)
+  implements Prisma.BookUpdateInput {}
