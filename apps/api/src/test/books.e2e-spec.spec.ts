@@ -4,7 +4,6 @@ import { PrismaService } from '@api/modules/prisma/prisma.service';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from '@tools/prisma/generated/client';
-import { Express } from 'express';
 import * as request from 'supertest';
 
 describe('BooksController (e2e)', () => {
@@ -50,7 +49,18 @@ describe('BooksController (e2e)', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe());
+
+    // Apply the same middleware and pipes as the main app
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+        transformOptions: {
+          enableImplicitConversion: true,
+        },
+      }),
+    );
 
     await app.init();
   });
@@ -64,7 +74,7 @@ describe('BooksController (e2e)', () => {
       const createdBook = { id: mockId, ...testBook };
       mockPrismaService.book.create.mockResolvedValue(createdBook);
 
-      return request(app.getHttpServer() as Express)
+      return request(app.getHttpServer())
         .post('/books')
         .send(testBook)
         .expect(201)
@@ -76,10 +86,7 @@ describe('BooksController (e2e)', () => {
     });
 
     it('should validate required fields', () => {
-      return request(app.getHttpServer() as Express)
-        .post('/books')
-        .send({})
-        .expect(400);
+      return request(app.getHttpServer()).post('/books').send({}).expect(400);
     });
   });
 
@@ -88,7 +95,7 @@ describe('BooksController (e2e)', () => {
       const books = [{ id: mockId, ...testBook }];
       mockPrismaService.book.findMany.mockResolvedValue(books);
 
-      return request(app.getHttpServer() as Express)
+      return request(app.getHttpServer())
         .get('/books')
         .expect(200)
         .expect((res) => {
@@ -104,7 +111,7 @@ describe('BooksController (e2e)', () => {
       const book = { id: mockId, ...testBook };
       mockPrismaService.book.findUniqueOrThrow.mockResolvedValue(book);
 
-      return request(app.getHttpServer() as Express)
+      return request(app.getHttpServer())
         .get(`/books/${mockId}`)
         .expect(200)
         .expect((res) => {
@@ -121,9 +128,7 @@ describe('BooksController (e2e)', () => {
         }),
       );
 
-      return request(app.getHttpServer() as Express)
-        .get(`/books/${mockId}`)
-        .expect(404);
+      return request(app.getHttpServer()).get(`/books/${mockId}`).expect(404);
     });
   });
 
@@ -133,7 +138,7 @@ describe('BooksController (e2e)', () => {
       const updatedBook = { id: mockId, ...testBook, ...updateData };
       mockPrismaService.book.update.mockResolvedValue(updatedBook);
 
-      return request(app.getHttpServer() as Express)
+      return request(app.getHttpServer())
         .put(`/books/${mockId}`)
         .send(updateData)
         .expect(200)
@@ -146,7 +151,7 @@ describe('BooksController (e2e)', () => {
     it('should return 404 when updating non-existent book', () => {
       mockPrismaService.book.update.mockRejectedValue(prismaError);
 
-      return request(app.getHttpServer() as Express)
+      return request(app.getHttpServer())
         .put(`/books/${mockId}`)
         .send({ title: 'Updated Title' })
         .expect(404);
@@ -158,7 +163,7 @@ describe('BooksController (e2e)', () => {
       const deletedBook = { id: mockId, ...testBook };
       mockPrismaService.book.delete.mockResolvedValue(deletedBook);
 
-      return request(app.getHttpServer() as Express)
+      return request(app.getHttpServer())
         .delete(`/books/${mockId}`)
         .expect(200)
         .expect((res) => {
@@ -169,7 +174,7 @@ describe('BooksController (e2e)', () => {
     it('should return 404 when deleting non-existent book', () => {
       mockPrismaService.book.delete.mockRejectedValue(prismaError);
 
-      return request(app.getHttpServer() as Express)
+      return request(app.getHttpServer())
         .delete(`/books/${mockId}`)
         .expect(404);
     });
