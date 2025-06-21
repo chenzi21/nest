@@ -1,52 +1,31 @@
 {
-  "name": "project2",
+  "name": "book-store",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Monorepo for API and Web applications",
+  "author": "Chen Zadik",
   "private": true,
   "license": "UNLICENSED",
+  "workspaces": [
+    "apps/*",
+    "web/*"
+  ],
   "scripts": {
-    "build": "nest build && tsc-alias",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
-    "start:dev": "pnpm prisma generate && concurrently \"nest start --watch --preserveWatchOutput\" \"tsc-alias -w\"",
-    "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "build": "pnpm run build:api",
+    "build:api": "pnpm --filter api build",
+    "build:web": "pnpm --filter web build",
+    "start:api": "pnpm --filter api start:dev",
+    "start:web": "pnpm --filter web start:dev",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "prisma:studio": "prisma studio",
+    "lint": "eslint \"apps/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "tsc": "tsc"
-  },
-  "dependencies": {
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/core": "^11.0.1",
-    "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "^11.2.0",
-    "@prisma/client": "^6.9.0",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.2",
-    "nestjs-prisma": "^0.25.0",
-    "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "test:e2e": "pnpm --filter api test:e2e"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
-    "@nestjs/cli": "^11.0.0",
-    "@nestjs/schematics": "^11.0.0",
-    "@nestjs/testing": "^11.0.1",
-    "@swc/cli": "^0.6.0",
-    "@swc/core": "^1.10.7",
-    "@types/express": "^5.0.0",
-    "@types/jest": "^29.5.14",
-    "@types/node": "^22.10.7",
-    "@types/supertest": "^6.0.2",
-    "concurrently": "^9.1.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
@@ -54,14 +33,15 @@
     "jest": "^29.7.0",
     "prettier": "^3.4.2",
     "prisma": "^6.9.0",
-    "source-map-support": "^0.5.21",
-    "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
-    "ts-loader": "^9.5.2",
-    "ts-node": "^10.9.2",
-    "tsc-alias": "^1.8.16",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
-  }
+  },
+  "dependencies": {
+    "@prisma/client": "6.9.0"
+  },
+  "prisma": {
+    "schema": "tools/prisma/schema.prisma"
+  },
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"
 }

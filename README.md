@@ -1,6 +1,6 @@
 # NestJS Book Management API
 
-A robust REST API built with NestJS for managing a book collection. This project demonstrates modern backend development practices and integrates several powerful tools and libraries.
+A robust, secure REST API built with NestJS for managing a book collection. This project demonstrates modern backend development practices with comprehensive security, monitoring, and containerization.
 
 ## 🚀 Features
 
@@ -9,7 +9,10 @@ A robust REST API built with NestJS for managing a book collection. This project
 - **API Documentation**: Auto-generated Swagger/OpenAPI documentation
 - **Database Integration**: PostgreSQL with Prisma ORM
 - **Type Safety**: Full TypeScript support
-- **Containerization**: Docker setup for both development and production
+- **Security**: Helmet, CORS, rate limiting, and input validation
+- **Monitoring**: Health checks and structured logging
+- **Containerization**: Secure Docker setup with internal networking
+- **Configuration Management**: Environment validation with Joi
 - **Package Management**: Using pnpm for faster, more efficient dependency management
 
 ## 🛠️ Tech Stack
@@ -22,6 +25,7 @@ A robust REST API built with NestJS for managing a book collection. This project
 - **Containerization**: Docker
 - **Package Manager**: pnpm
 - **Validation**: class-validator & class-transformer
+- **Security**: Helmet, Throttler, CORS
 
 ## 📋 Prerequisites
 
@@ -44,13 +48,43 @@ A robust REST API built with NestJS for managing a book collection. This project
    pnpm install
    ```
 
-3. **Start the development environment**
+3. **Set up environment variables**
+
+   Create your environment files based on the examples in `DOCKER_SECURITY.md`:
+
+   ```bash
+   # Development
+   NODE_ENV=development
+   PORT=8080
+   DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
+   CORS_ORIGINS=http://web:3000,http://localhost:3000
+   ```
+
+4. **Start the development environment**
+
    ```bash
    docker compose -f docker-compose.dev.yml up
    ```
 
-The API will be available at `http://localhost:3000`
-API documentation (Swagger UI) will be available at `http://localhost:3000/api`
+5. **Generate Prisma client and run migrations**
+   ```bash
+   pnpm prisma:generate
+   pnpm prisma:migrate
+   ```
+
+## 🌐 Service URLs
+
+### Development
+
+- **Web App**: `http://localhost:3000`
+- **API**: `http://localhost:8080`
+- **API Documentation**: `http://localhost:8080/api`
+- **Health Check**: `http://localhost:8080/health`
+
+### Production
+
+- **Web App**: `http://localhost:3000` (only external access)
+- **API & Database**: Internal network only (secure)
 
 ## 📚 API Endpoints
 
@@ -62,32 +96,46 @@ API documentation (Swagger UI) will be available at `http://localhost:3000/api`
 - `PUT /books/:id` - Update a book
 - `DELETE /books/:id` - Delete a book
 
+### Health & Monitoring
+
+- `GET /health` - Basic health check
+- `GET /health/db` - Database health check
+- `GET /health/detailed` - Detailed system health
+
 ## 🏗️ Project Structure
 
 ```
-src/
-├── modules/
-│   └── books/
-│       ├── books.controller.ts
-│       ├── books.dto.ts
-│       ├── books.manager.ts
-│       └── books.module.ts
-├── prisma/
-│   ├── prisma.module.ts
-│   └── prisma.service.ts
-└── main.ts
+├── apps/
+│   ├── api/               # NestJS API application
+│   │   ├── src/
+│   │   │   ├── config/    # Configuration management
+│   │   │   ├── modules/   # Feature modules
+│   │   │   │   ├── books/ # Book management
+│   │   │   │   ├── health/# Health checks
+│   │   │   │   └── prisma/# Database service
+│   │   │   └── main.ts    # Application bootstrap
+│   │   └── docker/        # Docker configuration
+│   └── web/               # Next.js web application
+├── tools/
+│   └── prisma/           # Database schema & migrations
+├── docker-compose.dev.yml # Development environment
+├── docker-compose.prod.yml# Production environment
+└── DOCKER_SECURITY.md     # Security documentation
 ```
 
 ## 🔧 Development
 
-### Database Migrations
+### Database Operations
 
 ```bash
 # Generate Prisma client
 pnpm prisma:generate
 
-# Run migrations
+# Create and run migrations
 pnpm prisma:migrate
+
+# Open Prisma Studio
+pnpm prisma:studio
 ```
 
 ### Running Tests
@@ -103,23 +151,100 @@ pnpm test:e2e
 pnpm test:cov
 ```
 
-## 🐳 Docker
+### Code Quality
 
-The project includes two Docker configurations:
+```bash
+# Linting
+pnpm lint
 
-- **Development** (`docker-compose.dev.yml`): Includes hot-reloading and development tools
-- **Production** (`docker-compose.prod.yml`): Optimized for production deployment
+# Format code
+pnpm format
+```
 
-## 📝 Environment Variables
+## 🐳 Docker & Security
 
-The following environment variables are used: (in docker compose)
+### Secure Network Architecture
 
-- `PORT`: API server port (default: 3000)
-- `DATABASE_URL`: PostgreSQL connection string
-- `NODE_ENV`: Environment (development/production)
+This project implements **Zero Trust** networking:
 
-## 🔐 Security
+- **Development**: API accessible externally for testing, database internal only
+- **Production**: Only web app exposed, API and database completely internal
+- **Network Isolation**: All services communicate over private Docker network
 
-- Input validation using class-validator
-- UUID validation for resource IDs
-- Type safety with TypeScript
+### Docker Configurations
+
+- **Development** (`docker-compose.dev.yml`): Hot-reloading, external API access
+- **Production** (`docker-compose.prod.yml`): Secure, internal-only communication
+
+See `DOCKER_SECURITY.md` for detailed security documentation.
+
+## 📝 Environment Configuration
+
+### Required Environment Variables
+
+```bash
+# Application
+NODE_ENV=development|production|test
+PORT=8080
+
+# Database
+DATABASE_URL=postgresql://user:password@host:port/database
+
+# Security
+CORS_ORIGINS=http://localhost:3000,http://web:3000
+
+# Production only
+DB_USER=secure_username
+DB_PASSWORD=secure_password
+DB_NAME=production_database
+```
+
+## 🔐 Security Features
+
+- **Helmet**: Security headers
+- **CORS**: Configurable cross-origin resource sharing
+- **Rate Limiting**: Configurable request throttling
+- **Input Validation**: Comprehensive request validation
+- **Network Isolation**: Docker internal networking
+- **Environment Validation**: Joi schema validation
+- **Graceful Shutdown**: Proper application lifecycle management
+
+## 📊 Monitoring & Health Checks
+
+- **Application Health**: `/health` endpoint
+- **Database Health**: `/health/db` endpoint
+- **Detailed Metrics**: `/health/detailed` endpoint
+- **Docker Health Checks**: Container-level monitoring
+- **Structured Logging**: Enhanced error tracking
+
+## 🚀 Production Deployment
+
+1. **Set environment variables**:
+
+   ```bash
+   export DATABASE_URL="your-production-db-url"
+   export DB_PASSWORD="your-secure-password"
+   ```
+
+2. **Deploy with production compose**:
+
+   ```bash
+   docker compose -f docker-compose.prod.yml up -d
+   ```
+
+3. **Verify health**:
+   ```bash
+   curl http://localhost:3000/health
+   ```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Follow the existing code style and patterns
+4. Add tests for new features
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the UNLICENSED License.

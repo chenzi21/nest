@@ -2,51 +2,81 @@ services:
   api-prod:
     container_name: nestjs-prod
     build:
-      context: .
-      dockerfile: Dockerfile.prod
+      context: apps/api
+      dockerfile: docker/Dockerfile.prod
       target: production
-    ports:
-      - 3001:3001
     environment:
-      - PORT=3001
+      - PORT=8080
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
+      - DATABASE_URL=${DATABASE_URL}
+      - CORS_ORIGINS=http://web-prod:3000
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     networks:
-      - db
+      - app-network
     depends_on:
       db:
         condition: service_healthy
-
-  db:
-    container_name: postgres
-    image: postgres
-    # nothing here is production ready, just for development
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: prisma
-      PGDATA: /data/postgres
-      POSTGRES_DB: postgres
-    volumes:
-      - db:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
-    networks:
-      - db
     restart: unless-stopped
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -d postgres -U postgres']
-      interval: 15s
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/health']
+      interval: 30s
       timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  web-prod:
+    container_name: nextjs-prod
+    build:
+      context: .
+      dockerfile: apps/web/docker/Dockerfile.prod
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_API_URL=http://api-prod:8080
+    networks:
+      - app-network
+    depends_on:
+      - api-prod
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  db:
+    container_name: postgres-prod
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-bookstore}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - db-prod:/var/lib/postgresql/data
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -d ${DB_NAME:-bookstore} -U ${DB_USER:-postgres}',
+        ]
+      interval: 10s
+      timeout: 5s
       retries: 5
-      start_period: 3s
+      start_period: 10s
 
 networks:
-  db:
+  app-network:
     driver: bridge
 
 volumes:
-  db:
+  db-prod:
     name: nest-db-prod

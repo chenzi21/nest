@@ -3,28 +3,52 @@ services:
     container_name: nestjs
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: apps/api/docker/Dockerfile.dev
       args:
         - DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
     ports:
-      - 3000:3000
+      - 8080:8080
     environment:
-      - PORT=3000
+      - PORT=8080
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
+      - CORS_ORIGINS=http://web:3000
     volumes:
-      - .:/usr/src/app
+      - ./apps/api:/usr/src/app/apps/api
+      - ./tools:/usr/src/app/tools
       - /usr/src/app/node_modules
+      - /usr/src/app/apps/api/node_modules
+      - /usr/src/app/tools/prisma/generated
     networks:
-      - db
+      - app-network
     depends_on:
       db:
         condition: service_healthy
 
+  web:
+    container_name: nextjs
+    build:
+      context: .
+      dockerfile: apps/web/docker/Dockerfile.dev
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_API_URL=http://api:8080
+    volumes:
+      - ./apps/web:/usr/src/app/apps/web
+      - /usr/src/app/node_modules
+      - /usr/src/app/apps/web/node_modules
+      - /usr/src/app/apps/web/.next
+    networks:
+      - app-network
+    depends_on:
+      - api
+
   db:
     container_name: postgres
     image: postgres
-    # nothing here is production ready, just for development
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: prisma
@@ -32,10 +56,8 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - db:/var/lib/postgresql/data
-    ports:
-      - '5432:5432'
     networks:
-      - db
+      - app-network
     restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -d postgres -U postgres']
@@ -45,7 +67,7 @@ services:
       start_period: 3s
 
 networks:
-  db:
+  app-network:
     driver: bridge
 
 volumes:

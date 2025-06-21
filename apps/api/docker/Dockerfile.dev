@@ -1,0 +1,38 @@
+# Stage 1: Build and run the application
+FROM node:24-alpine3.21 AS builder
+
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Enable corepack and prepare pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copy workspace configuration and root package files
+COPY tsconfig.base.json package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
+
+# Copy the API app's package.json
+COPY apps/api/package.json ./apps/api/
+
+# Copy Prisma schema
+COPY tools/prisma ./tools/prisma/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Add build argument for database URL
+ARG DATABASE_URL
+
+# Set it as an environment variable during build
+ENV DATABASE_URL=${DATABASE_URL}
+
+# Generate Prisma client with correct binary targets
+RUN pnpm prisma:generate
+
+# Set working directory to the API app
+WORKDIR /usr/src/app/apps/api
+
+# Expose the port
+EXPOSE 8080
+
+# Run the application
+CMD ["sh", "-c", "cd /usr/src/app && pnpm prisma:generate && cd /usr/src/app/apps/api && pnpm prisma:migrate && pnpm start:dev"]
