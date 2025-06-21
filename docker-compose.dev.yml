@@ -13,8 +13,15 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
     volumes:
-      - .:/usr/src/app
+      # Source code for hot reloading
+      - ./apps/api:/usr/src/app/apps/api
+      # Prisma schema access
+      - ./tools:/usr/src/app/tools
+      # Protect node_modules from being overwritten
       - /usr/src/app/node_modules
+      - /usr/src/app/apps/api/node_modules
+      # Protect Prisma generated client from being overwritten
+      - /usr/src/app/tools/prisma/generated
     networks:
       - db
     depends_on:
@@ -32,10 +39,12 @@ services:
       - NODE_ENV=development
       - NEXT_TELEMETRY_DISABLED=1
     volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/apps/web/node_modules
-      - /app/apps/web/.next
+      # Source code for hot reloading
+      - ./apps/web:/usr/src/app/apps/web
+      # Protect node_modules and build artifacts from being overwritten
+      - /usr/src/app/node_modules
+      - /usr/src/app/apps/web/node_modules
+      - /usr/src/app/apps/web/.next
 
   db:
     container_name: postgres

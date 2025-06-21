@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Copy workspace configuration and root package files
-COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
+COPY tsconfig.base.json package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 
 # Copy the API app's package.json
 COPY apps/api/package.json ./apps/api/
@@ -25,14 +25,14 @@ ARG DATABASE_URL
 # Set it as an environment variable during build
 ENV DATABASE_URL=${DATABASE_URL}
 
-# Generate Prisma schema
+# Generate Prisma client with correct binary targets
 RUN pnpm prisma:generate
 
-# Copy the rest of the application
-COPY . .
+# Set working directory to the API app
+WORKDIR /usr/src/app/apps/api
 
 # Expose the port
 EXPOSE 8080
 
 # Run the application
-CMD ["sh", "-c", "pnpm prisma:migrate && pnpm start:dev"]
+CMD ["sh", "-c", "cd /usr/src/app && pnpm prisma:generate && cd /usr/src/app/apps/api && pnpm prisma:migrate && pnpm start:dev"]

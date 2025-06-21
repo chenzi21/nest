@@ -18,8 +18,8 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@tools/*": ["tools/*"],
-      "@api/*": ["apps/api/*"],
-      "@web/*": ["apps/web/*"]
+      "@api/*": ["apps/api/src/*"],
+      "@web/*": ["apps/web/src/*"]
     }
   }
 }

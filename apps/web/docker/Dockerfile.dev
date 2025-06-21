@@ -3,10 +3,10 @@ FROM node:24-alpine3.21
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Set working directory
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copy root package files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY tsconfig.base.json pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 
 # Copy web app package.json
 COPY apps/web/package.json ./apps/web/
@@ -18,7 +18,7 @@ RUN pnpm install --frozen-lockfile
 COPY apps/web ./apps/web
 
 # Set working directory to web app
-WORKDIR /app/apps/web
+WORKDIR /usr/src/app/apps/web
 
 # Expose port
 EXPOSE 3000
