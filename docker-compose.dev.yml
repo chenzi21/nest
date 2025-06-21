@@ -3,13 +3,13 @@ services:
     container_name: nestjs
     build:
       context: .
-      dockerfile: Dockerfile.dev
+      dockerfile: apps/api/docker/Dockerfile.dev
       args:
         - DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
     ports:
-      - 3000:3000
+      - 8080:8080
     environment:
-      - PORT=3000
+      - PORT=8080
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
     volumes:
@@ -20,6 +20,22 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  web:
+    container_name: nextjs
+    build:
+      context: .
+      dockerfile: apps/web/docker/Dockerfile.dev
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/apps/web/node_modules
+      - /app/apps/web/.next
 
   db:
     container_name: postgres

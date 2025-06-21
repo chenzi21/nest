@@ -1,8 +1,16 @@
 # Dependencies
-node_modules
+node_modules/
+/node_modules
+**/node_modules
 
 # Test
-test
+apps/*/test
+apps/*/coverage
+apps/*/dist
+apps/*/build
+apps/*/node_modules
+apps/*/pnpm-lock.yaml
+apps/docker
 
 # Git
 .gitignore
@@ -10,8 +18,8 @@ test
 .prettierrc
 
 # Docker
-Dockerfile.dev
-docker-compose.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
 
 # Documentation
 README.md

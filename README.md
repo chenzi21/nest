@@ -49,8 +49,8 @@ A robust REST API built with NestJS for managing a book collection. This project
    docker compose -f docker-compose.dev.yml up
    ```
 
-The API will be available at `http://localhost:3000`
-API documentation (Swagger UI) will be available at `http://localhost:3000/api`
+The API will be available at `http://localhost:8080`
+API documentation (Swagger UI) will be available at `http://localhost:8080/api`
 
 ## 📚 API Endpoints
 
@@ -114,7 +114,7 @@ The project includes two Docker configurations:
 
 The following environment variables are used: (in docker compose)
 
-- `PORT`: API server port (default: 3000)
+- `PORT`: API server port (default: 8080)
 - `DATABASE_URL`: PostgreSQL connection string
 - `NODE_ENV`: Environment (development/production)
 

@@ -2,13 +2,13 @@ services:
   api-prod:
     container_name: nestjs-prod
     build:
-      context: .
-      dockerfile: Dockerfile.prod
+      context: apps/api
+      dockerfile: docker/Dockerfile.prod
       target: production
     ports:
-      - 3001:3001
+      - 8081:8081
     environment:
-      - PORT=3001
+      - PORT=8081
       - NODE_ENV=production
       - DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
     volumes:
@@ -19,6 +19,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  web-prod:
+    container_name: nextjs-prod
+    build:
+      context: .
+      dockerfile: apps/web/docker/Dockerfile.prod
+    ports:
+      - 3001:3001
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
 
   db:
     container_name: postgres

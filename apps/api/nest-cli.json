@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": ".",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "@nestjs/swagger"
+      }
+    ],
+    "webpack": true,
+    "tsConfigPath": "tsconfig.json",
+    "builder": "swc",
+    "typeCheck": true,
+    "deleteOutDir": true,
+    "assets": [{ "include": "../prisma", "outDir": "dist/prisma" }],
+    "watchAssets": true
+  }
+}
