@@ -15,3 +15,12 @@ CREATE TABLE "Book" (
 
     CONSTRAINT "Book_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE INDEX "Book_title_idx" ON "Book"("title");
+
+-- CreateIndex
+CREATE INDEX "Book_author_idx" ON "Book"("author");
+
+-- CreateIndex
+CREATE INDEX "Book_createdAt_idx" ON "Book"("createdAt");
