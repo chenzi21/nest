@@ -1,7 +1,7 @@
 import { AppModule } from '@api/modules/app.module';
-import { CreateBookDto } from '@api/modules/books/books.dto';
+import { CreateBookDto } from '@dto/books/books.dto';
 import { PrismaService } from '@api/modules/prisma/prisma.service';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from '@tools/prisma/generated/client';
 import * as request from 'supertest';
@@ -50,18 +50,7 @@ describe('BooksController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
 
-    // Apply the same middleware and pipes as the main app
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-      }),
-    );
-
+    // Removed ValidationPipe since we're using Zod validation pipes
     await app.init();
   });
 
@@ -71,10 +60,19 @@ describe('BooksController (e2e)', () => {
 
   describe('POST /books', () => {
     it('should create a new book', () => {
-      const createdBook = { id: mockId, ...testBook };
+      const testBook: CreateBookDto = {
+        title: 'Test Book',
+        author: 'Test Author',
+        publishedDate: new Date(),
+        isbn: '1234567890123',
+        pages: 200,
+        genre: 'Fiction',
+      };
+
+      const createdBook = { ...testBook, id: mockId };
       mockPrismaService.book.create.mockResolvedValue(createdBook);
 
-      return request(app.getHttpServer())
+      return (request as any)(app.getHttpServer())
         .post('/books')
         .send(testBook)
         .expect(201)
@@ -86,7 +84,10 @@ describe('BooksController (e2e)', () => {
     });
 
     it('should validate required fields', () => {
-      return request(app.getHttpServer()).post('/books').send({}).expect(400);
+      return (request as any)(app.getHttpServer())
+        .post('/books')
+        .send({})
+        .expect(400);
     });
   });
 
@@ -95,7 +96,7 @@ describe('BooksController (e2e)', () => {
       const books = [{ id: mockId, ...testBook }];
       mockPrismaService.book.findMany.mockResolvedValue(books);
 
-      return request(app.getHttpServer())
+      return (request as any)(app.getHttpServer())
         .get('/books')
         .expect(200)
         .expect((res) => {
@@ -111,7 +112,7 @@ describe('BooksController (e2e)', () => {
       const book = { id: mockId, ...testBook };
       mockPrismaService.book.findUniqueOrThrow.mockResolvedValue(book);
 
-      return request(app.getHttpServer())
+      return (request as any)(app.getHttpServer())
         .get(`/books/${mockId}`)
         .expect(200)
         .expect((res) => {
@@ -128,7 +129,9 @@ describe('BooksController (e2e)', () => {
         }),
       );
 
-      return request(app.getHttpServer()).get(`/books/${mockId}`).expect(404);
+      return (request as any)(app.getHttpServer())
+        .get(`/books/${mockId}`)
+        .expect(404);
     });
   });
 
@@ -138,7 +141,7 @@ describe('BooksController (e2e)', () => {
       const updatedBook = { id: mockId, ...testBook, ...updateData };
       mockPrismaService.book.update.mockResolvedValue(updatedBook);
 
-      return request(app.getHttpServer())
+      return (request as any)(app.getHttpServer())
         .put(`/books/${mockId}`)
         .send(updateData)
         .expect(200)
@@ -151,7 +154,7 @@ describe('BooksController (e2e)', () => {
     it('should return 404 when updating non-existent book', () => {
       mockPrismaService.book.update.mockRejectedValue(prismaError);
 
-      return request(app.getHttpServer())
+      return (request as any)(app.getHttpServer())
         .put(`/books/${mockId}`)
         .send({ title: 'Updated Title' })
         .expect(404);
@@ -163,7 +166,7 @@ describe('BooksController (e2e)', () => {
       const deletedBook = { id: mockId, ...testBook };
       mockPrismaService.book.delete.mockResolvedValue(deletedBook);
 
-      return request(app.getHttpServer())
+      return (request as any)(app.getHttpServer())
         .delete(`/books/${mockId}`)
         .expect(200)
         .expect((res) => {
@@ -174,7 +177,7 @@ describe('BooksController (e2e)', () => {
     it('should return 404 when deleting non-existent book', () => {
       mockPrismaService.book.delete.mockRejectedValue(prismaError);
 
-      return request(app.getHttpServer())
+      return (request as any)(app.getHttpServer())
         .delete(`/books/${mockId}`)
         .expect(404);
     });

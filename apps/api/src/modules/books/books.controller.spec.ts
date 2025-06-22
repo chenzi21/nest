@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksController } from '@api/modules/books/books.controller';
 import { BooksManager } from '@api/modules/books/books.manager';
-import { CreateBookDto, UpdateBookDto } from '@api/modules/books/books.dto';
+import { CreateBookDto, UpdateBookDto } from '@dto/books/books.dto';
 import { NotFoundException } from '@nestjs/common';
 import { Prisma } from '@tools/prisma/generated/client';
 

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksManager } from '@api/modules/books/books.manager';
 import { PrismaService } from '@api/modules/prisma/prisma.service';
-import { CreateBookDto, UpdateBookDto } from '@api/modules/books/books.dto';
+import { CreateBookDto, UpdateBookDto } from '@dto/books/books.dto';
 import { Book, Prisma } from '@tools/prisma/generated/client';
 
 describe('BooksManager', () => {
