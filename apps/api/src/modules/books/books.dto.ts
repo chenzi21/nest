@@ -1,5 +1,5 @@
 import { createZodDto } from '@anatine/zod-nestjs';
-import { CreateBookSchema, UpdateBookSchema } from '@schema/books/books.schema';
+import { createBookSchema, updateBookSchema } from '@schema/books/books.schema';
 
-export class CreateBookDto extends createZodDto(CreateBookSchema) {}
-export class UpdateBookDto extends createZodDto(UpdateBookSchema) {}
+export class CreateBookDto extends createZodDto(createBookSchema) {}
+export class UpdateBookDto extends createZodDto(updateBookSchema) {}

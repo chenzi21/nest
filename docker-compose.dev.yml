@@ -12,7 +12,8 @@ services:
       - PORT=8080
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
-      - CORS_ORIGINS=http://web:3000
+      - CORS_ORIGINS=http://localhost:3000
+      - CORS_CREDENTIALS=true
     volumes:
       - ./apps/api:/usr/src/app/apps/api
       - ./tools:/usr/src/app/tools
@@ -36,9 +37,14 @@ services:
     environment:
       - NODE_ENV=development
       - NEXT_TELEMETRY_DISABLED=1
-      - NEXT_PUBLIC_API_URL=http://api:8080
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
     volumes:
       - ./apps/web:/usr/src/app/apps/web
+      - ./shared:/usr/src/app/shared
+      - ./tools:/usr/src/app/tools
+      - ./tsconfig.base.json:/usr/src/app/tsconfig.base.json
       - /usr/src/app/node_modules
       - /usr/src/app/apps/web/node_modules
       - /usr/src/app/apps/web/.next
