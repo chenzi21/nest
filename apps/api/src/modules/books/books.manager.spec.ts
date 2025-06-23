@@ -1,18 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksManager } from '@api/modules/books/books.manager';
 import { PrismaService } from '@api/modules/prisma/prisma.service';
-import { CreateBookDto, UpdateBookDto } from '@schema/books/books.schema';
-import { Book, Prisma } from '@tools/prisma/generated/client';
+import { CreateBookSchema, UpdateBookSchema } from '@schema/books/books.schema';
+import { Prisma } from '@tools/prisma/generated/client';
 
 describe('BooksManager', () => {
   let manager: BooksManager;
 
-  const mockBook: Book = {
+  const mockBook = {
     id: '123e4567-e89b-12d3-a456-426614174000',
     title: 'Test Book',
     author: 'Test Author',
     description: 'Test Description',
-    price: new Prisma.Decimal(19.99),
+    price: 19.99,
     pages: 200,
     publisher: 'Test Publisher',
     published: new Date(),
@@ -103,11 +103,11 @@ describe('BooksManager', () => {
 
   describe('create', () => {
     it('should create a new book', async () => {
-      const createBookDto: CreateBookDto = {
+      const createBookDto: CreateBookSchema = {
         title: 'New Book',
         author: 'New Author',
         description: 'New Description',
-        price: new Prisma.Decimal(29.99),
+        price: 29.99,
         pages: 300,
         publisher: 'New Publisher',
         published: new Date(),
@@ -130,9 +130,9 @@ describe('BooksManager', () => {
 
   describe('update', () => {
     it('should update a book', async () => {
-      const updateBookDto: UpdateBookDto = {
+      const updateBookDto: UpdateBookSchema = {
         title: 'Updated Book',
-        price: new Prisma.Decimal(39.99),
+        price: 39.99,
       };
 
       mockPrismaService.book.update.mockResolvedValue({
@@ -149,7 +149,7 @@ describe('BooksManager', () => {
     });
 
     it('should throw PrismaClientKnownRequestError when updating non-existent book', async () => {
-      const updateBookDto: UpdateBookDto = { title: 'Updated Book' };
+      const updateBookDto: UpdateBookSchema = { title: 'Updated Book' };
       const prismaError = new Prisma.PrismaClientKnownRequestError(
         'Record not found',
         {
@@ -165,7 +165,7 @@ describe('BooksManager', () => {
     });
 
     it('should rethrow non-Prisma errors', async () => {
-      const updateBookDto: UpdateBookDto = { title: 'Updated Book' };
+      const updateBookDto: UpdateBookSchema = { title: 'Updated Book' };
       const error = new Error('Database connection failed');
       mockPrismaService.book.update.mockRejectedValue(error);
 

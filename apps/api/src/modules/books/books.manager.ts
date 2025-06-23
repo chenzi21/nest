@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateBookDto, UpdateBookDto } from '@schema/books/books.schema';
+import { CreateBookSchema, UpdateBookSchema } from '@schema/books/books.schema';
 import { PrismaService } from '@api/modules/prisma/prisma.service';
 
 @Injectable()
@@ -20,13 +20,13 @@ export class BooksManager {
     });
   }
 
-  async create(createBookDto: CreateBookDto) {
+  async create(createBookDto: CreateBookSchema) {
     return this.prisma.book.create({
       data: createBookDto,
     });
   }
 
-  async update(id: string, updateBookDto: UpdateBookDto) {
+  async update(id: string, updateBookDto: UpdateBookSchema) {
     return this.prisma.book.update({
       where: { id },
       data: updateBookDto,

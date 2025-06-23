@@ -1,9 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BooksController } from '@api/modules/books/books.controller';
 import { BooksManager } from '@api/modules/books/books.manager';
-import { CreateBookDto, UpdateBookDto } from '@schema/books/books.schema';
+import { CreateBookSchema, UpdateBookSchema } from '@schema/books/books.schema';
 import { NotFoundException } from '@nestjs/common';
-import { Prisma } from '@tools/prisma/generated/client';
 
 describe('BooksController', () => {
   let controller: BooksController;
@@ -80,11 +79,11 @@ describe('BooksController', () => {
 
   describe('create', () => {
     it('should create a new book', async () => {
-      const createBookDto: CreateBookDto = {
+      const createBookDto: CreateBookSchema = {
         title: 'New Book',
         author: 'New Author',
         description: 'New Description',
-        price: new Prisma.Decimal(29.99),
+        price: 29.99,
         pages: 300,
         publisher: 'New Publisher',
         published: new Date(),
@@ -105,9 +104,9 @@ describe('BooksController', () => {
 
   describe('update', () => {
     it('should update a book', async () => {
-      const updateBookDto: UpdateBookDto = {
+      const updateBookDto: UpdateBookSchema = {
         title: 'Updated Book',
-        price: new Prisma.Decimal(39.99),
+        price: 39.99,
       };
 
       mockBooksManager.update.mockResolvedValue({
@@ -124,7 +123,7 @@ describe('BooksController', () => {
     });
 
     it('should throw NotFoundException when updating non-existent book', async () => {
-      const updateBookDto: UpdateBookDto = { title: 'Updated Book' };
+      const updateBookDto: UpdateBookSchema = { title: 'Updated Book' };
       mockBooksManager.update.mockRejectedValue(new NotFoundException());
 
       await expect(

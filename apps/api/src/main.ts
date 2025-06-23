@@ -28,7 +28,7 @@ async function bootstrap() {
 
   app.enableShutdownHooks();
 
-  const config = new DocumentBuilder()
+  const documentConfig = new DocumentBuilder()
     .setTitle('NestJS Book Management API')
     .setDescription('A robust REST API for managing book collections')
     .setVersion('1.0')
@@ -37,14 +37,14 @@ async function bootstrap() {
 
   patchNestjsSwagger();
 
-  const document = SwaggerModule.createDocument(app, config, {
+  const document = SwaggerModule.createDocument(app, documentConfig, {
     deepScanRoutes: true,
     autoTagControllers: true,
   });
 
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   Logger.log(`🚀 Application is running on: http://localhost:${port}`);
   Logger.log(`📚 API Documentation: http://localhost:${port}/api`);
   Logger.log(`❤️  Health Check: http://localhost:${port}/health`);
