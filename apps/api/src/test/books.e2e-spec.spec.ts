@@ -1,10 +1,10 @@
 import { AppModule } from '@api/modules/app.module';
-import { CreateBookDto } from '@dto/books/books.dto';
+import { CreateBookDto } from '@schema/books/books.schema';
 import { PrismaService } from '@api/modules/prisma/prisma.service';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Prisma } from '@tools/prisma/generated/client';
-import * as request from 'supertest';
+import request from 'supertest';
 
 describe('BooksController (e2e)', () => {
   let app: INestApplication;
@@ -50,7 +50,6 @@ describe('BooksController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
 
-    // Removed ValidationPipe since we're using Zod validation pipes
     await app.init();
   });
 
@@ -63,10 +62,13 @@ describe('BooksController (e2e)', () => {
       const testBook: CreateBookDto = {
         title: 'Test Book',
         author: 'Test Author',
-        publishedDate: new Date(),
-        isbn: '1234567890123',
+        description: 'Test Description',
+        price: new Prisma.Decimal(19.99),
         pages: 200,
-        genre: 'Fiction',
+        publisher: 'Test Publisher',
+        published: new Date(),
+        genre: 'Test Genre',
+        inStock: 10,
       };
 
       const createdBook = { ...testBook, id: mockId };

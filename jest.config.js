@@ -16,7 +16,7 @@ module.exports = {
         '^@api/(.*)$': '<rootDir>/apps/api/src/$1',
         '^@web/(.*)$': '<rootDir>/apps/web/src/$1',
         '^@tools/(.*)$': '<rootDir>/tools/$1',
-        '^@dto/(.*)$': '<rootDir>/shared/dto/$1',
+        '^@schema/(.*)$': '<rootDir>/shared/dto/$1',
       },
     },
   ],

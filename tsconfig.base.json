@@ -20,7 +20,7 @@
       "@tools/*": ["tools/*"],
       "@api/*": ["apps/api/src/*"],
       "@web/*": ["apps/web/src/*"],
-      "@dto/*": ["shared/dto/*"]
+      "@schema/*": ["shared/schema/*"]
     }
   }
 }

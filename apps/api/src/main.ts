@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Logger } from '@nestjs/common';
 import { AppModule } from '@api/modules/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { patchNestjsSwagger } from '@anatine/zod-nestjs';
 import { Configuration } from '@api/config/configuration';
 import helmet from 'helmet';
 
@@ -33,6 +34,8 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('books')
     .build();
+
+  patchNestjsSwagger();
 
   const document = SwaggerModule.createDocument(app, config, {
     deepScanRoutes: true,

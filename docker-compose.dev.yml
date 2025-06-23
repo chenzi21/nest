@@ -16,6 +16,7 @@ services:
     volumes:
       - ./apps/api:/usr/src/app/apps/api
       - ./tools:/usr/src/app/tools
+      - ./shared:/usr/src/app/shared
       - /usr/src/app/node_modules
       - /usr/src/app/apps/api/node_modules
       - /usr/src/app/tools/prisma/generated

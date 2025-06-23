@@ -10,15 +10,11 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { BooksManager } from '@api/modules/books/books.manager';
-import {
-  CreateBookDto,
-  UpdateBookDto,
-  CreateBookSchema,
-  UpdateBookSchema,
-} from '@dto/books/books.dto';
 import { HandleTransformPrismaError } from '@api/modules/prisma/prisma-error.decorator';
-import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
-import { ZodValidationPipe } from '@api/common/pipes/zod-validation.pipe';
+import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ZodValidationPipe } from '@anatine/zod-nestjs';
+
+import { CreateBookDto, UpdateBookDto } from './books.dto';
 
 @ApiTags('books')
 @Controller('books')
@@ -41,24 +37,12 @@ export class BooksController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new book' })
-  @ApiBody({
-    description: 'Book creation data',
-    schema: {
-      type: 'object',
-      properties: {
-        title: { type: 'string' },
-        author: { type: 'string' },
-        description: { type: 'string' },
-        price: { type: 'number' },
-        pages: { type: 'number', minimum: 1 },
-        publisher: { type: 'string' },
-        published: { type: 'string', format: 'date' },
-        genre: { type: 'string' },
-        inStock: { type: 'number', minimum: 0 },
-      },
-    },
+  @ApiResponse({
+    status: 201,
+    description: 'Book created successfully',
+    type: CreateBookDto,
   })
-  @UsePipes(new ZodValidationPipe(CreateBookSchema))
+  @UsePipes(ZodValidationPipe)
   create(@Body() createBookDto: CreateBookDto) {
     return this.booksManager.create(createBookDto);
   }
@@ -66,24 +50,12 @@ export class BooksController {
   @Put(':id')
   @ApiOperation({ summary: 'Update a book' })
   @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
-  @ApiBody({
-    description: 'Book update data',
-    schema: {
-      type: 'object',
-      properties: {
-        title: { type: 'string' },
-        author: { type: 'string' },
-        description: { type: 'string' },
-        price: { type: 'number' },
-        pages: { type: 'number', minimum: 1 },
-        publisher: { type: 'string' },
-        published: { type: 'string', format: 'date' },
-        genre: { type: 'string' },
-        inStock: { type: 'number', minimum: 0 },
-      },
-    },
+  @ApiResponse({
+    status: 200,
+    description: 'Book updated successfully',
+    type: UpdateBookDto,
   })
-  @UsePipes(new ZodValidationPipe(UpdateBookSchema))
+  @UsePipes(ZodValidationPipe)
   @HandleTransformPrismaError()
   update(
     @Param('id', ParseUUIDPipe) id: string,
