@@ -1,186 +1,309 @@
-# NestJS Book Management API
+# 📚 Book Management System
 
-A robust, secure REST API built with NestJS for managing a book collection. This project demonstrates modern backend development practices with comprehensive security, monitoring, and containerization.
+A modern, full-stack book management system built with **NestJS** and **Next.js**. This project demonstrates enterprise-level development practices with a beautiful, responsive UI and a robust, secure backend API.
 
-## 🚀 Features
+## ✨ Features
 
-- **Book Management**: Full CRUD operations for books
-- **Data Validation**: Using class-validator for request validation
+### 🎨 **Beautiful Web Interface**
+
+- **📊 Interactive Data Table**: Powerful books table with sorting, filtering, and pagination
+- **🔍 Real-time Search**: Global search across all book fields
+- **📱 Responsive Design**: Works perfectly on desktop, tablet, and mobile
+- **🌙 Dark Mode**: Built-in dark/light theme support
+- **⚡ Live Updates**: Real-time data synchronization with React Query
+- **🎯 Professional UI**: Modern interface built with TailwindCSS
+
+### 🛠️ **Table Features**
+
+- **Sortable Columns**: Click any header to sort (title, author, price, pages, etc.)
+- **Advanced Filtering**: Global search + individual column filters
+- **Smart Pagination**: Navigate through large datasets with customizable page sizes (5, 10, 20, 50)
+- **Visual Indicators**: Color-coded stock levels, price highlighting, genre badges
+- **Loading States**: Smooth loading animations and error handling
+- **Empty States**: Helpful messages when no data matches filters
+
+### 🔧 **Backend API**
+
+- **Full CRUD Operations**: Complete book management functionality
+- **Data Validation**: Comprehensive validation using Zod schemas
 - **API Documentation**: Auto-generated Swagger/OpenAPI documentation
-- **Database Integration**: PostgreSQL with Prisma ORM
-- **Type Safety**: Full TypeScript support
+- **Type Safety**: Full TypeScript support with Prisma integration
 - **Security**: Helmet, CORS, rate limiting, and input validation
-- **Monitoring**: Health checks and structured logging
-- **Containerization**: Secure Docker setup with internal networking
-- **Configuration Management**: Environment validation with Joi
-- **Package Management**: Using pnpm for faster, more efficient dependency management
+- **Health Monitoring**: Comprehensive health checks and structured logging
 
-## 🛠️ Tech Stack
+## 🚀 Tech Stack
 
-- **Framework**: NestJS
-- **Language**: TypeScript
-- **Database**: PostgreSQL
-- **ORM**: Prisma
-- **API Documentation**: Swagger/OpenAPI
-- **Containerization**: Docker
-- **Package Manager**: pnpm
-- **Validation**: class-validator & class-transformer
-- **Security**: Helmet, Throttler, CORS
+### **Frontend**
+
+- **Framework**: Next.js 15 with React 19
+- **Styling**: TailwindCSS with custom components
+- **State Management**: React Query (@tanstack/react-query)
+- **Table**: @tanstack/react-table for advanced data table features
+- **Type Safety**: Full TypeScript integration
+- **Build Tool**: Turbopack for lightning-fast development
+
+### **Backend**
+
+- **Framework**: NestJS with TypeScript
+- **Database**: PostgreSQL with Prisma ORM
+- **Validation**: Zod schemas with automatic validation
+- **Documentation**: Swagger/OpenAPI auto-generation
+- **Security**: Comprehensive security middleware stack
+
+### **Infrastructure**
+
+- **Containerization**: Docker with multi-stage builds
+- **Package Management**: pnpm for efficient dependency management
+- **Development**: Hot-reloading with file watching
+- **Database**: PostgreSQL with automatic migrations
 
 ## 📋 Prerequisites
 
-- Docker and Docker Compose
-- pnpm (for local development)
-- Node.js (for local development)
+- **Docker & Docker Compose** (recommended)
+- **Node.js 18+** (for local development)
+- **pnpm 8+** (package manager)
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
-1. **Clone the repository**
+### **Option 1: Docker (Recommended)**
+
+1. **Clone and start the entire stack**:
 
    ```bash
    git clone https://github.com/chenzi21/nest.git
    cd nest
+   docker compose -f docker-compose.dev.yml up --build
    ```
 
-2. **Install dependencies**
+2. **Access the applications**:
+   - **📱 Web App**: http://localhost:3000
+   - **🔧 API**: http://localhost:8080
+   - **📚 API Docs**: http://localhost:8080/api
+
+### **Option 2: Local Development**
+
+1. **Install dependencies**:
 
    ```bash
    pnpm install
    ```
 
-3. **Set up environment variables**
-
-   Create your environment files based on the examples in `DOCKER_SECURITY.md`:
+2. **Set up environment variables**:
 
    ```bash
    # Development
    NODE_ENV=development
    PORT=8080
-   DATABASE_URL=postgresql://postgres:prisma@db:5432/postgres?schema=public
-   CORS_ORIGINS=http://web:3000,http://localhost:3000
+   DATABASE_URL=postgresql://postgres:prisma@localhost:5432/postgres
+   CORS_ORIGINS=http://localhost:3000
    ```
 
-4. **Start the development environment**
+3. **Start services**:
 
    ```bash
-   docker compose -f docker-compose.dev.yml up
+   # Terminal 1: Start API
+   pnpm start:api
+
+   # Terminal 2: Start Web App
+   pnpm start:web
    ```
 
-5. **Generate Prisma client and run migrations**
-   ```bash
-   pnpm prisma:generate
-   pnpm prisma:migrate
-   ```
+## 🌐 Application URLs
 
-## 🌐 Service URLs
+### **Development**
 
-### Development
+- **🎨 Web Interface**: `http://localhost:3000` - Beautiful book management UI
+- **⚙️ API Server**: `http://localhost:8080` - RESTful API endpoints
+- **📖 API Documentation**: `http://localhost:8080/api` - Interactive Swagger docs
+- **🏥 Health Check**: `http://localhost:8080/health` - API health status
 
-- **Web App**: `http://localhost:3000`
-- **API**: `http://localhost:8080`
-- **API Documentation**: `http://localhost:8080/api`
-- **Health Check**: `http://localhost:8080/health`
+### **Production**
 
-### Production
-
-- **Web App**: `http://localhost:3000` (only external access)
-- **API & Database**: Internal network only (secure)
+- **🌍 Web App**: External access only (port 3000)
+- **🔒 API & Database**: Internal network only (secure architecture)
 
 ## 📚 API Endpoints
 
-### Books
+### **Books Management**
 
-- `GET /books` - Get all books
-- `GET /books/:id` - Get a specific book
+- `GET /books` - Get all books with sorting and filtering
+- `GET /books/:id` - Get a specific book by ID
 - `POST /books` - Create a new book
-- `PUT /books/:id` - Update a book
+- `PUT /books/:id` - Update an existing book
 - `DELETE /books/:id` - Delete a book
 
-### Health & Monitoring
+### **Health & Monitoring**
 
-- `GET /health` - Basic health check
-- `GET /health/db` - Database health check
-- `GET /health/detailed` - Detailed system health
+- `GET /health` - Basic application health check
+- `GET /health/db` - Database connectivity check
+- `GET /health/detailed` - Comprehensive system metrics
+
+## 🎯 Key UI Features
+
+### **📊 Advanced Data Table**
+
+```typescript
+// Powerful sorting, filtering, and pagination
+- Click column headers to sort data
+- Type in search box for global filtering
+- Use pagination controls to navigate
+- Adjust page size (5, 10, 20, 50 items)
+- Responsive design for all screen sizes
+```
+
+### **🔄 Real-time Updates**
+
+```typescript
+// Automatic data synchronization
+- Add new books via "Add Sample Book" button
+- Table updates automatically without refresh
+- Optimistic updates for better UX
+- Error handling with user-friendly messages
+```
+
+### **🎨 Visual Design**
+
+```typescript
+// Professional, modern interface
+- Clean typography with Geist font family
+- Intuitive icons and visual indicators
+- Smooth animations and transitions
+- Consistent color scheme and spacing
+```
 
 ## 🏗️ Project Structure
 
 ```
-├── apps/
-│   ├── api/               # NestJS API application
-│   │   ├── src/
-│   │   │   ├── config/    # Configuration management
-│   │   │   ├── modules/   # Feature modules
-│   │   │   │   ├── books/ # Book management
-│   │   │   │   ├── health/# Health checks
-│   │   │   │   └── prisma/# Database service
-│   │   │   └── main.ts    # Application bootstrap
-│   │   └── docker/        # Docker configuration
-│   └── web/               # Next.js web application
-├── tools/
-│   └── prisma/           # Database schema & migrations
-├── docker-compose.dev.yml # Development environment
-├── docker-compose.prod.yml# Production environment
-└── DOCKER_SECURITY.md     # Security documentation
+📁 nest/
+├── 📁 apps/
+│   ├── 📁 api/                    # NestJS Backend API
+│   │   ├── 📁 src/
+│   │   │   ├── 📁 modules/        # Feature modules
+│   │   │   │   ├── 📁 books/      # Book management
+│   │   │   │   ├── 📁 health/     # Health checks
+│   │   │   │   └── 📁 prisma/     # Database service
+│   │   │   └── 📄 main.ts         # Application bootstrap
+│   │   └── 📁 docker/             # Docker configuration
+│   └── 📁 web/                    # Next.js Frontend
+│       ├── 📁 src/
+│       │   ├── 📁 app/            # Next.js app router
+│       │   ├── 📁 components/     # React components
+│       │   │   └── 📁 books/      # Book-related components
+│       │   │       ├── 📄 BooksTable.tsx    # Advanced data table
+│       │   │       └── 📄 Button.tsx        # Add book button
+│       │   └── 📁 lib/            # Utilities and API hooks
+│       │       └── 📁 api/books/  # React Query hooks
+│       └── 📁 docker/             # Docker configuration
+├── 📁 tools/
+│   └── 📁 prisma/                 # Database schema & migrations
+├── 📁 shared/
+│   └── 📁 schema/                 # Shared TypeScript types
+├── 📄 docker-compose.dev.yml     # Development environment
+├── 📄 docker-compose.prod.yml    # Production environment
+└── 📄 DOCKER_SECURITY.md         # Security documentation
 ```
 
-## 🔧 Development
+## 🧪 Development Workflow
 
-### Database Operations
+### **📊 Working with the Books Table**
+
+1. **Adding Books**:
+
+   ```bash
+   # Use the "Add Sample Book" button in the UI
+   # Or make API calls directly to POST /books
+   ```
+
+2. **Table Features**:
+
+   ```bash
+   # Sorting: Click any column header
+   # Filtering: Type in the search box
+   # Pagination: Use navigation controls
+   # Page Size: Select from dropdown (5, 10, 20, 50)
+   ```
+
+3. **Real-time Updates**:
+   ```bash
+   # Data automatically refreshes when:
+   # - New books are added
+   # - Existing books are modified
+   # - Network connection is restored
+   ```
+
+### **🔧 Database Operations**
 
 ```bash
 # Generate Prisma client
 pnpm prisma:generate
 
-# Create and run migrations
+# Run database migrations
 pnpm prisma:migrate
 
 # Open Prisma Studio
 pnpm prisma:studio
 ```
 
-### Running Tests
+### **🧪 Testing**
 
 ```bash
-# Unit tests
+# API Tests
+pnpm --filter api test
+pnpm --filter api test:e2e
+
+# Web Tests (when implemented)
+pnpm --filter web test
+
+# Full test suite
 pnpm test
-
-# e2e tests
-pnpm test:e2e
-
-# Test coverage
-pnpm test:cov
 ```
 
-### Code Quality
+## 🔐 Security Features
 
-```bash
-# Linting
-pnpm lint
+- **🛡️ Network Isolation**: Docker internal networking
+- **🔒 Input Validation**: Comprehensive Zod schema validation
+- **🚦 Rate Limiting**: Configurable request throttling
+- **🛡️ Security Headers**: Helmet.js security middleware
+- **🌐 CORS Protection**: Configurable cross-origin resource sharing
+- **📊 Health Monitoring**: Application and database health checks
 
-# Format code
-pnpm format
-```
+## 🐳 Docker Architecture
 
-## 🐳 Docker & Security
+### **🔄 Development Mode**
 
-### Secure Network Architecture
+- **Hot-reloading** for both frontend and backend
+- **External API access** for testing and development
+- **Volume mounting** for real-time code changes
+- **Database persistence** across container restarts
 
-This project implements **Zero Trust** networking:
+### **🚀 Production Mode**
 
-- **Development**: API accessible externally for testing, database internal only
-- **Production**: Only web app exposed, API and database completely internal
-- **Network Isolation**: All services communicate over private Docker network
+- **Zero Trust networking** - only web app externally accessible
+- **Optimized builds** with multi-stage Docker files
+- **Security hardening** with minimal attack surface
+- **Health checks** for container orchestration
 
-### Docker Configurations
+## 🎨 UI Screenshots & Features
 
-- **Development** (`docker-compose.dev.yml`): Hot-reloading, external API access
-- **Production** (`docker-compose.prod.yml`): Secure, internal-only communication
+### **📱 Books Management Interface**
 
-See `DOCKER_SECURITY.md` for detailed security documentation.
+- **Clean, modern design** with intuitive navigation
+- **Responsive layout** that works on all devices
+- **Real-time search** across all book fields
+- **Visual stock indicators** (green/yellow/red dots)
+- **Professional typography** with proper spacing
 
-## 📝 Environment Configuration
+### **📊 Advanced Data Table**
 
-### Required Environment Variables
+- **Sortable columns** with visual sort indicators
+- **Pagination controls** with page size selection
+- **Loading states** with smooth animations
+- **Empty states** with helpful guidance
+- **Error handling** with user-friendly messages
+
+## 🔧 Environment Configuration
+
+### **Required Variables**
 
 ```bash
 # Application
@@ -190,61 +313,54 @@ PORT=8080
 # Database
 DATABASE_URL=postgresql://user:password@host:port/database
 
+# Frontend
+NEXT_PUBLIC_API_URL=http://localhost:8080
+
 # Security
 CORS_ORIGINS=http://localhost:3000,http://web:3000
-
-# Production only
-DB_USER=secure_username
-DB_PASSWORD=secure_password
-DB_NAME=production_database
 ```
 
-## 🔐 Security Features
+## 🚀 Deployment
 
-- **Helmet**: Security headers
-- **CORS**: Configurable cross-origin resource sharing
-- **Rate Limiting**: Configurable request throttling
-- **Input Validation**: Comprehensive request validation
-- **Network Isolation**: Docker internal networking
-- **Environment Validation**: Joi schema validation
-- **Graceful Shutdown**: Proper application lifecycle management
+### **Development**
 
-## 📊 Monitoring & Health Checks
+```bash
+docker compose -f docker-compose.dev.yml up --build
+```
 
-- **Application Health**: `/health` endpoint
-- **Database Health**: `/health/db` endpoint
-- **Detailed Metrics**: `/health/detailed` endpoint
-- **Docker Health Checks**: Container-level monitoring
-- **Structured Logging**: Enhanced error tracking
+### **Production**
 
-## 🚀 Production Deployment
+```bash
+# Set environment variables
+export DATABASE_URL="your-production-db-url"
+export DB_PASSWORD="your-secure-password"
 
-1. **Set environment variables**:
-
-   ```bash
-   export DATABASE_URL="your-production-db-url"
-   export DB_PASSWORD="your-secure-password"
-   ```
-
-2. **Deploy with production compose**:
-
-   ```bash
-   docker compose -f docker-compose.prod.yml up -d
-   ```
-
-3. **Verify health**:
-   ```bash
-   curl http://localhost:3000/health
-   ```
+# Deploy
+docker compose -f docker-compose.prod.yml up -d
+```
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Follow the existing code style and patterns
-4. Add tests for new features
-5. Submit a pull request
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Commit changes**: `git commit -m 'Add amazing feature'`
+4. **Push to branch**: `git push origin feature/amazing-feature`
+5. **Open a Pull Request**
 
 ## 📄 License
 
-This project is licensed under the UNLICENSED License.
+This project is licensed under the **UNLICENSED** License - see the source code for details.
+
+## 🙏 Acknowledgments
+
+- **NestJS** - Progressive Node.js framework
+- **Next.js** - React framework for production
+- **Prisma** - Next-generation ORM
+- **React Query** - Powerful data synchronization
+- **TailwindCSS** - Utility-first CSS framework
+- **@tanstack/react-table** - Headless table library
+- **Docker** - Containerization platform
+
+---
+
+**🎉 Built with ❤️ by Chen Zadik**
