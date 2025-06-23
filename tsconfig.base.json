@@ -19,7 +19,8 @@
     "paths": {
       "@tools/*": ["tools/*"],
       "@api/*": ["apps/api/src/*"],
-      "@web/*": ["apps/web/src/*"]
+      "@web/*": ["apps/web/src/*"],
+      "@schema/*": ["shared/schema/*"]
     }
   }
 }

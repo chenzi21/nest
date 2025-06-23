@@ -7,11 +7,14 @@ import {
   Body,
   Param,
   ParseUUIDPipe,
+  UsePipes,
 } from '@nestjs/common';
 import { BooksManager } from '@api/modules/books/books.manager';
-import { CreateBookDto, UpdateBookDto } from '@api/modules/books/books.dto';
 import { HandleTransformPrismaError } from '@api/modules/prisma/prisma-error.decorator';
-import { ApiTags, ApiOperation, ApiParam, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ZodValidationPipe } from '@anatine/zod-nestjs';
+
+import { CreateBookDto, UpdateBookDto } from './books.dto';
 
 @ApiTags('books')
 @Controller('books')
@@ -34,7 +37,12 @@ export class BooksController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new book' })
-  @ApiBody({ type: CreateBookDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Book created successfully',
+    type: CreateBookDto,
+  })
+  @UsePipes(ZodValidationPipe)
   create(@Body() createBookDto: CreateBookDto) {
     return this.booksManager.create(createBookDto);
   }
@@ -42,7 +50,12 @@ export class BooksController {
   @Put(':id')
   @ApiOperation({ summary: 'Update a book' })
   @ApiParam({ name: 'id', type: 'string', format: 'uuid' })
-  @ApiBody({ type: UpdateBookDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Book updated successfully',
+    type: UpdateBookDto,
+  })
+  @UsePipes(ZodValidationPipe)
   @HandleTransformPrismaError()
   update(
     @Param('id', ParseUUIDPipe) id: string,

@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { AppModule } from '@api/modules/app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { patchNestjsSwagger } from '@anatine/zod-nestjs';
 import { Configuration } from '@api/config/configuration';
 import helmet from 'helmet';
 
@@ -25,17 +26,6 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-    }),
-  );
-
   app.enableShutdownHooks();
 
   const config = new DocumentBuilder()
@@ -44,6 +34,8 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('books')
     .build();
+
+  patchNestjsSwagger();
 
   const document = SwaggerModule.createDocument(app, config, {
     deepScanRoutes: true,
